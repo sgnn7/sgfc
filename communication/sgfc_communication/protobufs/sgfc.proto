@@ -1,0 +1,41 @@
+syntax = "proto2";
+package sgfc;
+
+message FlightMessage {
+  optional string sender = 1;
+  optional string auth_key = 2;
+  optional string sequence_id = 3;
+
+  repeated Payload payload = 1000;
+}
+
+message Payload {
+  required PayloadType type = 1;
+
+  oneof data {
+    GpsPosition gps_position = 100;
+    FlightControlCommand flight_control_command = 101;
+  }
+}
+
+enum PayloadType {
+  GPS_POSITION = 1;
+  FLIGHT_CONTROL_COMMAND = 2;
+}
+
+message GpsPosition {
+  optional bool has_fix = 1;
+  optional double latitude = 2;
+  optional double longitude = 3;
+  optional double altitude = 4;
+  optional double speed = 5;
+}
+
+message FlightControlCommand {
+  optional double longitudinal = 1;
+  optional double lateral = 2;
+  optional double pitch = 3;
+  optional double roll = 4;
+  optional double yaw = 5;
+  optional double throttle = 6;
+}
