@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='sgfc-position',
+    name='sgfc_position',
     zip_safe = True,
     version='0.1',
     url='',
