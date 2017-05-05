@@ -11,6 +11,7 @@ def comm_error_callback(error):
     print(error)
 
 comm_device = sgfc_communication.get_device('zigbee_xbee',
+                                            '\x00\x01',
                                             comm_callback,
                                             comm_error_callback,
                                             device='/dev/ttyUSB0')
@@ -26,5 +27,8 @@ try:
                                          controller_callback)
     controller.run()
 except KeyboardInterrupt as kbi:
-    controller.close()
-    comm_device.close()
+    if controller:
+        controller.close()
+
+    if comm_device:
+        comm_device.close()
