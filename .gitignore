@@ -1,2 +1,4 @@
 /core
 *.sw[po]
+
+venv/
