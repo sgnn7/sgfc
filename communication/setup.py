@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='sgfc-communication',
+    name='sgfc_communication',
     zip_safe = True,
     version='0.1',
     url='',
@@ -11,6 +11,7 @@ setup(
     author_email='sgnn7@sgnn7.org',
     packages=find_packages(),
     install_requires = [
-        'XBee'
+        'protobuf',
+        'XBee',
     ],
 )
