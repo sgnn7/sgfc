@@ -1,0 +1,3 @@
+./control
+./communication
+https://github.com/ynsta/steamcontroller/tarball/master#egg=python-steamcontroller
