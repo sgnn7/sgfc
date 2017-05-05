@@ -1,4 +1,5 @@
 /core
 *.sw[po]
+*.pyc
 
 venv/
