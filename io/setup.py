@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='sgfc',
+    name='sgfc_io',
     zip_safe = True,
     version='0.1',
     url='',
@@ -10,9 +10,5 @@ setup(
     author='Srdjan Grubor',
     author_email='sgnn7@sgnn7.org',
     packages=find_packages(),
-    install_requires = [
-        'sgfc_communication',
-        'sgfc_control',
-        'sgfc_io',
-    ],
+    install_requires = [],
 )
