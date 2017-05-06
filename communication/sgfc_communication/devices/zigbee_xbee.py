@@ -98,7 +98,7 @@ class ZigbeeXbeeCommDevice(CommDeviceApi):
         self.wait_for_at_ack(debug)
 
     def tx(self, dest, data, debug=True):
-        frame_id = "%c" % random.randint(0, 255)
+        frame_id = "%c" % random.randint(1, 255)
 
         print("- Frame: %s" % self.to_hex(frame_id))
         self._xbee.tx(frame_id=frame_id, dest_addr=dest, data=data)
