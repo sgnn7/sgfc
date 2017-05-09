@@ -15,12 +15,19 @@ message Payload {
   oneof data {
     GpsPosition gps_position = 100;
     FlightControlCommand flight_control_command = 101;
+    CameraData camera_data = 102;
   }
 }
 
 enum PayloadType {
   GPS_POSITION = 1;
   FLIGHT_CONTROL_COMMAND = 2;
+  CAMERA_IMAGE = 3;
+}
+
+enum CameraDataType {
+  RAW = 1;
+  JPEG = 2;
 }
 
 message GpsPosition {
@@ -29,6 +36,12 @@ message GpsPosition {
   optional double longitude = 3;
   optional double altitude = 4;
   optional double speed = 5;
+}
+
+message CameraData {
+  optional string source_id = 1;
+  optional CameraDataType type = 2;
+  optional bytes data = 3;
 }
 
 message FlightControlCommand {
