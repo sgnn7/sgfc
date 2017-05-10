@@ -8,15 +8,12 @@ import sgfc_vision
 from sgfc_communication.protobufs import sgfc_pb2 as fc_proto
 
 
-cv2.startWindowThread()
-cv2.namedWindow('image', cv2.WINDOW_NORMAL | cv2.WINDOW_AUTOSIZE)
+camera_device = sgfc_vision.get_device(1)
 
-compressed_image = sgfc_vision.get_compressed_image()
+for index in range(100):
+    compressed_image = sgfc_vision.get_compressed_image(camera_device)
+    print(index, len(compressed_image))
 
-
-try:
-    cv2.imshow('image', cv2.imdecode(compressed_image, 1))
-    time.sleep(20)
-finally:
-    cv2.imwrite('img.jpg', compressed_image)
-    cv2.destroyAllWindows()
+    cv2.imwrite('img.jpg',
+                cv2.imdecode(compressed_image, cv2.CV_LOAD_IMAGE_COLOR),
+                [cv2.IMWRITE_JPEG_QUALITY, sgfc_vision.DEFAULT_JPEG_QUALITY])
