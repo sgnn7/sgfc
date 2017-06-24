@@ -51,9 +51,15 @@ PIC_REGISTER = {
 
     'SPBRG1': 0xaf,
     'CCPTMRS': 0x59,
+
     'CCP1CON': 0xbd,
+    'CCP2CON': 0x97,
+
     'CCPR1H': 0xbf,
     'CCPR1L': 0xbe,
+
+    'CCPR2H': 0x91,
+    'CCPR2L': 0x90,
 
     'T2CON': 0xba,
     'PR2': 0xbb,
