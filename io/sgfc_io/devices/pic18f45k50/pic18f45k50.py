@@ -16,16 +16,27 @@ class Pic18F45K50IoDevice(IoDeviceApi):
         self._pwm = Bunch(PIC_REGISTER)
         self._bit = Bunch(PIC_BITS)
 
-        sfr_set_regbit(self._usb, self._pwm.ANSELD, 5, 0)
-        sfr_set_regbit(self._usb, self._pwm.TRISD,  5, dir_input)
+        # Set all registers RD* and RB* to digital
+        sfr_set_regbit(self._usb, self._pwm.ANSELD, 0, 0)
+
+        # Set all RD* and all RB* to output
+        sfr_set_regbit(self._usb, self._pwm.TRISD,  0, dir_input)
+
+        # PWM timer selection C/C == TMR1, PWM == TMR2
         sfr_set_reg(self._usb, self._pwm.CCPTMRS, 0x00)
-        sfr_set_reg(self._usb, self._pwm.PR2, 250)
+
+        # CCP PWM mode
         sfr_set_reg(self._usb, self._pwm.CCP1CON, 0b00001100)
+
+        sfr_set_reg(self._usb, self._pwm.PR2, 0xBA)
         sfr_set_reg(self._usb, self._pwm.CCPR1L, 0x00)
-        sfr_set_reg(self._usb, self._pwm.T2CON, 0b01111101)
-        sfr_set_regbit(self._usb, self._pwm.PSTR1CON, 1, 1)
-        sfr_set_regbit(self._usb, self._pwm.TRISD,  5, dir_output)
-        sfr_set_reg(self._usb, self._pwm.CCPR1L, 0x64)
+        sfr_set_reg(self._usb, self._pwm.T2CON, 0b01111110)
+
+        # Define output
+        sfr_set_regbit(self._usb, self._pwm.PSTR1CON, 1, 0b00001111)
+        sfr_set_regbit(self._usb, self._pwm.TRISD,  0b00000101, dir_output)
+
+        sfr_set_reg(self._usb, self._pwm.CCPR1L, 0x22)
 
     def close(self):
         usb_close(self._usb)
@@ -33,7 +44,7 @@ class Pic18F45K50IoDevice(IoDeviceApi):
     def set_front_left_pwm(self, ratio):
         print("Ratio:", ratio)
 
-        value = int(ratio * 0x7d * 2)
+        value = int(ratio * 0xBA)
         print("Register:", "0x" + "{:02x}".format(value).upper())
 
         sfr_set_reg(self._usb, self._pwm.CCPR1L, value)
