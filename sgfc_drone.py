@@ -12,6 +12,8 @@ from sgfc_communication.protobufs import sgfc_pb2 as fc_proto
 class SgfcDrone(object):
     def __init__(self):
         self._throttle = 0.0
+        self._yaw = 0.0
+        self._pitch = 0.0
 
     def comm_callback(self, io_dev, data):
         message = fc_proto.FlightMessage()
@@ -29,6 +31,24 @@ class SgfcDrone(object):
                         io_dev.set_all_pwm(throttle)
                     else:
                         print("WARN: Redundant throttle msg!")
+                if fc_command.yaw:
+                    yaw = fc_command.yaw
+                    if (yaw != self._yaw):
+                        print("Yaw: %s" % yaw)
+                        self._yaw = yaw
+                        # Do something different here
+                        io_dev.set_all_pwm(yaw)
+                    else:
+                        print("WARN: Redundant yaw msg!")
+                if fc_command.pitch:
+                    pitch = fc_command.pitch
+                    if (pitch != self._pitch):
+                        print("Pitch: %s" % pitch)
+                        self._pitch = pitch
+                        # Do something different here
+                        io_dev.set_all_pwm(pitch)
+                    else:
+                        print("WARN: Redundant pitch msg!")
 
     def comm_error_callback(self, error):
         print(error)
@@ -38,6 +58,15 @@ class SgfcDrone(object):
         io_dev = None
         try:
             io_dev = sgfc_io.get_device('pic18f45k50', sgfc_io.I2C)
+
+            io_dev.set_all_pwm(0.0)
+            time.sleep(0.2)
+
+            io_dev.set_all_pwm(1.0)
+            time.sleep(1)
+
+            io_dev.set_all_pwm(0.1)
+            io_dev.set_all_pwm_clamp(lower=0.5)
 
             comm_device = sgfc_communication.get_device('zigbee_xbee',
                                                         '\x00\x02',
@@ -51,6 +80,7 @@ class SgfcDrone(object):
                 comm_device.close()
 
             if io_dev:
+                io_dev.set_all_pwm_clamp(lower=0.0)
                 io_dev.set_all_pwm(0.0)
                 io_dev.close()
 

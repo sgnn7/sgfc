@@ -26,5 +26,8 @@ class IoDeviceApiV1(object):
         self.set_back_left_pwm(ratio)
         self.set_back_right_pwm(ratio)
 
+    def set_all_pwm_clamp(self, lower=0.0, upper=1.0):
+        raise NotImplementedError()
+
 class IoDeviceApi(IoDeviceApiV1):
     I2C = 0b00000001

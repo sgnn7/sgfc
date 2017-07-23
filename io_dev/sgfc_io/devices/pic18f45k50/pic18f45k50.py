@@ -74,6 +74,9 @@ class Pic18F45K50IoDevice(IoDeviceApi):
         self._debug = debug
         self._usb = init()
 
+        self._lower_clamp = 0.0
+        self._upper_clamp = 1.0
+
         self._using_i2c = flags and ((flags | IoDeviceApi.I2C) == IoDeviceApi.I2C)
         if self._using_i2c:
             print("Using I2C mode")
@@ -85,9 +88,19 @@ class Pic18F45K50IoDevice(IoDeviceApi):
         usb_close(self._usb)
 
     def _set_channel_pwm(self, channel, ratio):
-        print("Ratio:", ratio)
+        # Clamp the value to usable values
+        ratio = min(max(0.0, ratio), 1.0)
+
+        # Scale and clamp the values to user-set points
+        ratio = self._lower_clamp + ((self._upper_clamp - self._lower_clamp) * ratio)
+
+        print("Ratio (ch%d): %f" % (channel, ratio))
         off_at=int(4095 * ratio)
         self._pca9685.set_pwm(channel, 0x00, off_at)
+
+    def set_all_pwm_clamp(self, lower=0, upper=1.0):
+        self._lower_clamp = lower
+        self._upper_clamp = upper
 
     def set_front_left_pwm(self, ratio):
         if self._using_i2c:
