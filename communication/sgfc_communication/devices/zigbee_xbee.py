@@ -30,8 +30,35 @@ class ZigbeeXbeeCommDevice(CommDeviceApi):
 
         print("Device: %s" % (dev_name,))
         print("Network ID: %s" % self.to_hex(network_id))
-        self._dev_serial = serial.Serial(dev_name, 9600, timeout=SERIAL_TIMEOUT)
 
+        # Bump serial speed to 115200 bps if on default
+        tmp_dev_serial = None
+        try:
+            tmp_dev_serial = serial.Serial(dev_name, 9600, timeout=SERIAL_TIMEOUT)
+            print("Entering command mode...")
+            self.exec_at(b'+++', device=tmp_dev_serial, newline=False)
+
+            # Set speed to 115,200 bps
+            self.exec_at(b'ATBD 7', device=tmp_dev_serial)
+
+            # Apply changes
+            self.exec_at(b'ATAC', device=tmp_dev_serial)
+
+            time.sleep(0.2)
+
+            # Exit command mode
+            self.exec_at(b'ATCN', device=tmp_dev_serial)
+
+            time.sleep(0.1)
+        except Exception as e:
+            # We intentionally ignore errors here
+            pass
+        finally:
+            if tmp_dev_serial:
+                tmp_dev_serial.close()
+                tmp_dev_serial = None
+
+        self._dev_serial = serial.Serial(dev_name, 115200, timeout=SERIAL_TIMEOUT)
         print("Entering command mode...")
         self.exec_at(b'+++', newline=False)
 
@@ -61,8 +88,9 @@ class ZigbeeXbeeCommDevice(CommDeviceApi):
                           callback=self._rx_callback,
                           error_callback=self._error_callback)
 
-    def wait_for_at_ack(self, debug=False):
+    def wait_for_at_ack(self, device=None, debug=False):
         response = ''
+        device = device or self._dev_serial
         if debug:
             print("- ACK wait...")
 
@@ -70,7 +98,7 @@ class ZigbeeXbeeCommDevice(CommDeviceApi):
             if len(response) > 0 and response[-1] == '\r':
                 break
 
-            char = self._dev_serial.read(1)
+            char = device.read(1)
             if not char:
                 raise RuntimeError("Could not read response!")
 
@@ -86,7 +114,7 @@ class ZigbeeXbeeCommDevice(CommDeviceApi):
 
         print('')
 
-    def exec_at(self, command, newline=True, debug=False):
+    def exec_at(self, command, device=None, newline=True, debug=False):
         if newline:
             command += '\r'
 
@@ -94,8 +122,9 @@ class ZigbeeXbeeCommDevice(CommDeviceApi):
         if debug:
             print("Sending: %s" % (self.to_hex(command)))
 
-        self._dev_serial.write(command)
-        self.wait_for_at_ack(debug)
+        device = device or self._dev_serial
+        device.write(command)
+        self.wait_for_at_ack(device=device, debug=debug)
 
     def tx(self, dest, data, debug=True):
         frame_id = "%c" % random.randint(1, 255)
