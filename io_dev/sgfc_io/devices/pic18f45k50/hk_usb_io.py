@@ -208,45 +208,45 @@ def sfr_set_regbit(dev, reg, rbit, bval):    # set a SFR register bit
     return ret[1]
 
 def i2c_init(dev):            # init i2c
-    dev.write(1,[u_i2c_init], 100)
+    dev.write(1,[u_i2c_init], 200)
 
 def i2c_idle(dev):            # i2c idle
-    dev.write(1,[u_i2c_idle], 100)
+    dev.write(1,[u_i2c_idle], 200)
 
 def i2c_start(dev, cval):        # i2c start
     a = array('B',[0,0,0,0,0,0,0,0,0,0,0,0,0,0])
     a[0] = u_i2c_strt
     a[1] = cval
-    dev.write(1, a, 100)
+    dev.write(1, a, 200)
 
 def i2c_stop(dev):            # i2c stop
-    dev.write(1,[u_i2c_stop], 100)
+    dev.write(1,[u_i2c_stop], 200)
 
 def i2c_slave_ack(dev):            # i2c slave ack
-    dev.write(1,[u_i2c_slak], 100)
-    ret = dev.read(0x81, 64, 100)
+    dev.write(1,[u_i2c_slak], 200)
+    ret = dev.read(0x81, 64, 200)
     return ret[1]            # 1=no ack, 0=ack
 
 def i2c_write(dev, cval):        # i2c write
     a = array('B',[0,0,0,0,0,0,0,0,0,0,0,0,0,0])
     a[0] = u_i2c_writ
     a[1] = cval
-    dev.write(1, a, 100)
+    dev.write(1, a, 200)
 
 def i2c_master_ack(dev, cval):        # 1=nack, 0=ack
     a = array('B',[0,0,0,0,0,0,0,0,0,0,0,0,0,0])
     a[0] = u_i2c_mack
     a[1] = cval
-    dev.write(1, a, 100)
+    dev.write(1, a, 200)
 
 def i2c_read(dev):            # i2c read
-    dev.write(1,[u_i2c_read], 100)
-    ret = dev.read(0x81, 64, 100)
+    dev.write(1,[u_i2c_read], 200)
+    ret = dev.read(0x81, 64, 200)
     return ret[1]            # i2c_read char
 
 def i2c_isdatardy(dev):            # check if i2c char avail
-    dev.write(1,[u_i2c_dtrd], 100)
-    ret = dev.read(0x81, 64, 100)
+    dev.write(1,[u_i2c_dtrd], 200)
+    ret = dev.read(0x81, 64, 200)
     return ret[1]            # i2c_read char
 
 def spi_init(dev, mode, baud, sample):    # SPI init
