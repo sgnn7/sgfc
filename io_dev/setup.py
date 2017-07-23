@@ -10,5 +10,7 @@ setup(
     author='Srdjan Grubor',
     author_email='sgnn7@sgnn7.org',
     packages=find_packages(),
-    install_requires = [],
+    install_requires = [
+        'pyusb',
+    ]
 )

@@ -1,4 +1,5 @@
 ./control
 ./communication
-./vision
+./io_dev
+#./vision
 https://github.com/ynsta/steamcontroller/tarball/master#egg=python-steamcontroller

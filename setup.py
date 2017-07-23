@@ -13,7 +13,7 @@ setup(
     install_requires = [
         'sgfc_communication',
         'sgfc_control',
-        'sgfc_io',
-        'sgfc_vision',
+        'sgfc_io'
+#        'sgfc_vision',
     ],
 )
