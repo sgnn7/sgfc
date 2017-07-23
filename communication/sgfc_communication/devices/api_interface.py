@@ -22,6 +22,9 @@ class CommDeviceApiV1(object):
             delimiter = ''
             prefix = ''
 
+        if isinstance(data, (int, long)):
+            return "{:02x}".format(data).upper()
+
         return delimiter.join([prefix + "{:02x}".format(ord(char)).upper() for char in data])
 
     def send_control_update(self, dest, data):

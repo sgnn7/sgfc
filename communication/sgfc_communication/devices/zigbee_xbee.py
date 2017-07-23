@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import argparse
+import threading
 import random
 import time
 import serial
@@ -10,6 +11,7 @@ from xbee import XBee
 from .api_interface import CommDeviceApi
 
 SERIAL_TIMEOUT = 5.0
+TX_TIMEOUT = 1
 
 class ZigbeeXbeeCommDevice(CommDeviceApi):
     def __init__(self, dev_name, id,
@@ -21,6 +23,7 @@ class ZigbeeXbeeCommDevice(CommDeviceApi):
         self._dev_serial = None
         self._debug = debug
 
+        self._current_frame = 1
         self._dev_name = dev_name
         self._network_id = network_id
         self._tx_responses = {}
@@ -127,19 +130,41 @@ class ZigbeeXbeeCommDevice(CommDeviceApi):
         self.wait_for_at_ack(device=device, debug=debug)
 
     def tx(self, dest, data, debug=True):
-        frame_id = "%c" % random.randint(1, 255)
+        frame_id = 1 + (self._current_frame % 254)
+        self._current_frame = frame_id
+
+        # If we have a response of a frame previously left over,
+        # clean up since we wrapped around by now
+        if frame_id in self._tx_responses:
+            del self._tx_responses[frame_id]
 
         print("- Frame: %s" % self.to_hex(frame_id))
-        self._xbee.tx(frame_id=frame_id, dest_addr=dest, data=data)
+        frame_id_str = "%c" % frame_id
+        self._xbee.tx(frame_id=frame_id_str, dest_addr=dest, data=data)
 
-        # TODO: This is only sync right now - need to do it async somehow 
+        # TODO: This is only sync right now - need to do it async somehow
         #       in a nicer API than the XBee package
         print("- Waiting for response...")
-        while not self._got_response_to(frame_id):
+
+        def tx_timeout():
+            print("  WARN: Did not get response to frame %s" % \
+                  self.to_hex(frame_id))
+
+        tx_timeout_timer = threading.Timer(TX_TIMEOUT,
+                                           tx_timeout)
+        tx_timeout_timer.start()
+
+        while (tx_timeout_timer.is_alive()) and \
+              (not self._got_response_to(frame_id_str)):
             try:
                 time.sleep(0.0001)
             except KeyboardInterrupt as kbi:
                 raise kbi
+
+
+        if tx_timeout_timer.is_alive():
+            tx_timeout_timer.cancel()
+            return False
 
         return True
 
